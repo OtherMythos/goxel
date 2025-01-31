@@ -1209,6 +1209,15 @@ void goxel_render_view(const float viewport[4], bool render_mode)
 
 void image_update(image_t *img);
 
+extern const char* targetLayer;
+void goxel_print_layers()
+{
+    layer_t *layer;
+    DL_FOREACH(goxel.image->layers, layer) {
+        printf("layer: %s\n", layer->name);
+    }
+}
+
 const volume_t *goxel_get_layers_volume(const image_t *img)
 {
     uint32_t key = 0, k;
@@ -1227,6 +1236,11 @@ const volume_t *goxel_get_layers_volume(const image_t *img)
         volume_clear(goxel.layers_volume_);
         DL_FOREACH(img->layers, layer) {
             if (!layer->visible) continue;
+            if(targetLayer != 0){
+                if(strcmp(layer->name, targetLayer) != 0){
+                    continue;
+                }
+            }
             volume_merge(goxel.layers_volume_, layer->volume, MODE_OVER, NULL);
         }
     }

@@ -64,6 +64,8 @@ typedef struct
     char *input;
     char *export;
     float scale;
+    char* layer;
+    int listLayers;
 
     const char *script;
     int script_args_nb;
@@ -73,6 +75,7 @@ typedef struct
 #define OPT_HELP 1
 #define OPT_VERSION 2
 #define OPT_SCRIPT 3
+#define OPT_LIST 4
 
 typedef struct {
     const char *name;
@@ -85,6 +88,9 @@ typedef struct {
 static const gox_option_t OPTIONS[] = {
     {"export", 'e', required_argument, "FILENAME",
         .help="Export the image to a file"},
+    {"layer", 'l', required_argument, "FILENAME",
+        .help="Layer to specifically export to"},
+    {"list", OPT_LIST, .help="List the names of all layers"},
     {"scale", 's', required_argument, "FLOAT", .help="Set UI scale"},
     {"script", OPT_SCRIPT, required_argument, "FILENAME",
         .help="Run a script and exit"},
@@ -144,9 +150,15 @@ static void parse_options(int argc, char **argv, args_t *args)
         case 's':
             args->scale = atof(optarg);
             break;
+        case 'l':
+            args->layer = optarg;
+            break;
         case OPT_HELP:
             print_help();
             exit(0);
+        case OPT_LIST:
+            args->listLayers = true;
+            break;
         case OPT_VERSION:
             printf("Goxel " GOXEL_VERSION_STR "\n");
             exit(0);
@@ -376,6 +388,7 @@ static bool open_dialog(
     return false;
 }
 
+const char* targetLayer = 0;
 int main(int argc, char **argv)
 {
     args_t args = {.scale = 1};
@@ -447,7 +460,14 @@ int main(int argc, char **argv)
         goto end;
     }
 
+    if (args.listLayers){
+        goxel_print_layers();
+        exit(0);
+    }
+
     if (args.export) {
+        targetLayer = args.layer;
+
         if (!args.input) {
             LOG_E("trying to export an empty image");
             ret = -1;

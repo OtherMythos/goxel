@@ -636,6 +636,8 @@ enum {
     HINT_COORDINATES = 1 << 3,
 };
 
+void goxel_print_layers();
+
 void goxel_add_hint(int flags, const char *title, const char *msg);
 
 void goxel_import_image_plane(const char *path);
