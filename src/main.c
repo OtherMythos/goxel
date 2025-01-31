@@ -166,7 +166,9 @@ static void parse_options(int argc, char **argv, args_t *args)
     }
 }
 
-
+const double fpsLimit = 1.0 / 30.0;
+double lastUpdateTime = 0;  // number of seconds since the last loop
+double lastFrameTime = 0;   // number of seconds since the last frame
 static void loop_function(void *arg)
 {
     int fb_size[2], win_size[2];
@@ -176,6 +178,8 @@ static void loop_function(void *arg)
     float scales[2];
     GLFWmonitor *monitor;
     GLFWwindow *window = arg;
+
+    double now = glfwGetTime();
 
     if (    !glfwGetWindowAttrib(window, GLFW_VISIBLE) ||
              glfwGetWindowAttrib(window, GLFW_ICONIFIED)) {
@@ -193,6 +197,8 @@ static void loop_function(void *arg)
     g_inputs->window_size[1] = fb_size[1] / scale;
     g_inputs->scale = scale;
 
+    if ((now - lastFrameTime) >= fpsLimit)
+    {
     GL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
     for (i = GLFW_KEY_SPACE; i <= GLFW_KEY_LAST; i++) {
@@ -215,8 +221,13 @@ static void loop_function(void *arg)
 
     memset(g_inputs, 0, sizeof(*g_inputs));
     glfwSwapBuffers(window);
+
+        lastFrameTime = now;
+    }
 end:
     glfwPollEvents();
+
+    lastUpdateTime = now;
 }
 
 #ifndef __EMSCRIPTEN__
