@@ -398,6 +398,7 @@ int main(int argc, char **argv)
     int width = 640, height = 480, ret = 0;
     inputs_t inputs = {};
     g_inputs = &inputs;
+    int enableWindow = 1;
 
     // Setup sys callbacks.
     sys_callbacks.set_window_title = set_window_title;
@@ -406,7 +407,11 @@ int main(int argc, char **argv)
     sys_callbacks.open_dialog = open_dialog;
     parse_options(argc, argv, &args);
 
-if(!args.export){
+    if (args.listLayers || args.export){
+        enableWindow = 0;
+    }
+
+if(enableWindow > 0){
     g_scale = args.scale;
 
     glfwSetErrorCallback(on_glfw_error);
@@ -477,11 +482,13 @@ if(!args.export){
             ret = goxel_export_to_file(args.export, NULL);
         }
         goto end;
-    }else{
+    }
+
+    if(enableWindow > 0){
         start_main_loop(loop_function, window);
     }
 end:
-    if(!args.export){
+    if(enableWindow > 0){
         glfwTerminate();
     }
     goxel_release();
