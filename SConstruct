@@ -23,7 +23,7 @@ vars = Variables('settings.py')
 vars.AddVariables(
     EnumVariable('mode', 'Build mode', 'debug',
         allowed_values=('debug', 'release', 'profile', 'analyze')),
-    BoolVariable('werror', 'Warnings as error', True),
+    BoolVariable('werror', 'Warnings as error', False),
     BoolVariable('sound', 'Enable sound', False),
     BoolVariable('yocto', 'Enable yocto renderer', True),
     PathVariable('config_file', 'Config file to use', 'src/config.h'),
