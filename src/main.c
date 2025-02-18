@@ -406,6 +406,7 @@ int main(int argc, char **argv)
     sys_callbacks.open_dialog = open_dialog;
     parse_options(argc, argv, &args);
 
+if(!args.export){
     g_scale = args.scale;
 
     glfwSetErrorCallback(on_glfw_error);
@@ -445,6 +446,7 @@ int main(int argc, char **argv)
 #ifdef WIN32
     glewInit();
 #endif
+}
     goxel_init();
 
     // Run the unit tests in debug.
@@ -475,10 +477,13 @@ int main(int argc, char **argv)
             ret = goxel_export_to_file(args.export, NULL);
         }
         goto end;
+    }else{
+        start_main_loop(loop_function, window);
     }
-    start_main_loop(loop_function, window);
 end:
-    glfwTerminate();
+    if(!args.export){
+        glfwTerminate();
+    }
     goxel_release();
     return ret;
 }
